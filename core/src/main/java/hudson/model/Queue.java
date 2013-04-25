@@ -495,6 +495,8 @@ public class Queue extends ResourceController implements Saveable {
      *      is that such {@link Item} only captures the state of the item at a particular moment,
      *      and by the time you inspect the object, some of its information can be already stale.
      *
+     *      If concurrent builds are allowed for the task, duplicates will be allowed.
+     *
      *      That said, one can still look at {@link WaitingItem#future}, {@link WaitingItem#id}, etc.
      */
     private synchronized WaitingItem scheduleInternal(Task p, int quietPeriod, List<Action> actions) {
@@ -515,7 +517,7 @@ public class Queue extends ResourceController implements Saveable {
     			duplicatesInQueue.add(item);
     		}
     	}
-    	if (duplicatesInQueue.isEmpty()) {
+    	if (duplicatesInQueue.isEmpty() || p.isConcurrentBuild()) {
     		LOGGER.log(Level.FINE, "{0} added to queue", p);
 
     		// put the item in the queue
